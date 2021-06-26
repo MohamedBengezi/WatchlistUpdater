@@ -1,21 +1,25 @@
-from selenium.webdriver.common.action_chains import ActionChains
 from selenium import webdriver
-from time import sleep
+from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
+from time import sleep
 
-f = open("info.txt", "r")
-lines = f.readlines()
-username = lines[0]
-password = lines[1]
-
+# Defining webdriver, tradingview url, symbol array, and selenium actionchains
 driver = webdriver.Chrome()
 URL = "https://www.tradingview.com/chart/DyTqgXAt/"
-driver.get(URL)
-
 symbols = []
 actions = ActionChains(driver)
 
 
+# Retrieving tradingview login email and password from info.txt
+def get_login_info():
+    f = open("info.txt", "r")
+    lines = f.readlines()
+    username = lines[0]
+    password = lines[1]
+    return username, password
+
+
+# Reading symbols from second column of a csv file
 def read_from_csv():
     with open("list.csv", "r") as csv_list:
         for line in csv_list:
@@ -26,13 +30,14 @@ def read_from_csv():
             print(symbol)
 
 
+# Signing in to tradingview
 def sign_in():
     signin = driver.find_element_by_class_name("tv-header__user-menu-button")
     signin.click()
     signin2 = driver.find_element_by_class_name("item-2IihgTnv")
     signin2.click()
 
-    sleep(2)
+    sleep(1)
 
     signin3 = driver.find_element_by_class_name("js-show-email")
     signin3.click()
@@ -45,6 +50,7 @@ def sign_in():
     signin4.click()
 
 
+# Adding each symbol in symbols array to watchlist by pressing Alt + W
 def add_to_watchlist():
     for symbol in symbols:
         actions.send_keys(symbol)
@@ -55,6 +61,8 @@ def add_to_watchlist():
     actions.perform()
 
 
+driver.get(URL)
+username, password = get_login_info()
 read_from_csv()
 sign_in()
 sleep(2)
